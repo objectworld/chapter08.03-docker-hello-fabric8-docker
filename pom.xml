@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.1.2</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>org.objectworld.docker</groupId>
+	<artifactId>docker-hello</artifactId>
+	<version>0.0.2-SNAPSHOT</version>
+	<name>docker-hello</name>
+	<description>Docker Hello Application</description>
+	<properties>
+		<java.version>17</java.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<!-- To run: mvn docker:build -->
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.43.3</version>
+				<configuration>
+					<images>
+						<image>
+							<name>objectworld/${project.name}:${project.version}</name>
+							<build>
+								<from>eclipse-temurin:17-jdk</from>
+								<maintainer>yuskim@gmail.com</maintainer>
+								<assembly>
+									<descriptorRef>artifact</descriptorRef>
+								</assembly>
+								<ports>
+									<port>8080</port>
+								</ports>
+								<cmd>java -Djava.security.egd=file:/dev/./urandom -jar maven/${project.build.finalName}.jar</cmd>
+							</build>
+							<run>
+								<ports>
+									<port>28080:8080</port>
+								</ports>
+							</run>
+						</image>
+					</images>
+				</configuration>
+				<!-- Adding this part always executes the docker:build during Maven's 
+					package phase. No need to execute above mentioned command. -->
+				<executions>
+					<execution>
+						<id>docker:build</id>
+						<phase>package</phase>
+						<goals>
+							<goal>build</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
